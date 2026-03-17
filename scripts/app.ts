@@ -3,17 +3,17 @@ import { runApp, Column, Text, Container, StatelessWidget, Widget } from "../fra
 class MyCustomWidget extends StatelessWidget {
   build(): Widget {
     return Column([
-      Text("Custom Widget!", "#000000"),
-      Container({ width: 50, height: 250 , color: "#90e0ef" }),
+      Text("Hello, World!", "#000000"),
+      Container({ width: 250, height: 150 , color: "#90e0ef" }),
     ]);
   }
 }
 
 runApp(
   Column([
-    Text("Framework App", "#90e0ef"),
+    Text("Evi Framework UI", "#5d0fe6"),
     new MyCustomWidget(),
-    Text("Testing bindings...", "#f1faee")
+    Text("Hi", "#47b123")
   ]),
   {
     backgroundColor: "#ffffff",

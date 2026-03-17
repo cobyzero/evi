@@ -80,6 +80,30 @@ export function runApp(widget: Widget, options?: { backgroundColor?: string; tex
   render(widget, 0, 0);
 }
 
+function measureHeight(widget: Widget): number {
+  if (widget instanceof _Text) {
+    return 30;
+  }
+
+  if (widget instanceof _Container) {
+    return widget.props.height || 0;
+  }
+
+  if (widget instanceof _Column) {
+    let total = 0;
+    for (const child of widget.children) {
+      total += measureHeight(child);
+    }
+    return total;
+  }
+
+  if (widget instanceof StatelessWidget) {
+    return measureHeight(widget.build());
+  }
+
+  return 0;
+}
+
 function render(widget: Widget, x: number, y: number) {
   if (widget instanceof _Text) {
     drawText(widget.text, x, y, parseColor(widget.color, 0));
@@ -90,7 +114,7 @@ function render(widget: Widget, x: number, y: number) {
     let currentY = y;
     for (const child of widget.children) {
       render(child, x, currentY);
-      currentY += 30; // Basic layout offset
+      currentY += measureHeight(child);
     }
   } else if (widget instanceof StatelessWidget) {
     const built = widget.build();

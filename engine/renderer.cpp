@@ -181,6 +181,10 @@ void setTextColor(uint32_t color) {
     sDefaultTextColor = color;
 }
 
+void clearCommands() {
+    commandQueue.clear();
+}
+
 void flushCommands() {
     if (!sSurface) return;
 
@@ -211,13 +215,20 @@ void flushCommands() {
         glViewport(0, 0, sSurfaceWidth, sSurfaceHeight);
         glClear(GL_COLOR_BUFFER_BIT);
 
+        GLenum uploadFormat = GL_RGBA;
+        if (pixmap.colorType() == kBGRA_8888_SkColorType) {
+            uploadFormat = GL_BGRA;
+        } else if (pixmap.colorType() == kRGBA_8888_SkColorType) {
+            uploadFormat = GL_RGBA;
+        }
+
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, sTexture);
         glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
         glPixelStorei(GL_UNPACK_ROW_LENGTH,
                       static_cast<int>(pixmap.rowBytes() / 4));
         glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, pixmap.width(), pixmap.height(),
-                        GL_BGRA, GL_UNSIGNED_BYTE, pixmap.addr());
+                        uploadFormat, GL_UNSIGNED_BYTE, pixmap.addr());
         glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
 
         glUseProgram(sProgram);

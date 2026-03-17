@@ -17,8 +17,15 @@ void initJS() {
 }
 
 void shutdownJS() {
-  JS_FreeContext(ctx);
-  JS_FreeRuntime(rt);
+  if (ctx) {
+    JS_FreeContext(ctx);
+    ctx = nullptr;
+  }
+  if (rt) {
+    js_std_free_handlers(rt);
+    JS_FreeRuntime(rt);
+    rt = nullptr;
+  }
 }
 
 void runScript(const std::string &path) {

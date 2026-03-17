@@ -33,4 +33,17 @@ fi
 # 3. Ejecutar
 echo -e "${BLUE}🛰️  Ejecutando Engine...${NC}"
 cd ..
+
+echo -e "${GREEN}👀 Iniciando TypeScript en modo watch para hot reload...${NC}"
+npx tsc --watch --preserveWatchOutput &
+TSC_WATCH_PID=$!
+
+cleanup() {
+    if kill -0 "$TSC_WATCH_PID" 2>/dev/null; then
+        kill "$TSC_WATCH_PID" 2>/dev/null || true
+    fi
+}
+
+trap cleanup EXIT INT TERM
+
 ./build/engine
