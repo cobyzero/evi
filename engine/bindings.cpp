@@ -1,5 +1,5 @@
+#include "bindings.h"
 #include "quickjs/quickjs.h"
-#include <iostream>
 #include "renderer.h"
 
 static JSValue js_drawRect(JSContext *ctx, JSValueConst this_val, int argc,

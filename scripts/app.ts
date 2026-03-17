@@ -1,4 +1,4 @@
-import { runApp, Column, Text, Container, StatelessWidget, Widget } from "../framework/widgets.js";
+import { runApp, Column, Text, Container, StatelessWidget, Widget, Row } from "../framework/widgets.js";
 
 class MyCustomWidget extends StatelessWidget {
   build(): Widget {
@@ -13,7 +13,12 @@ runApp(
   Column([
     Text("Evi Framework UI", "#5d0fe6"),
     new MyCustomWidget(),
-    Text("Hi", "#47b123")
+    Text("Hi", "#47b123"),
+    Row([
+        Text("Hi", "#47b123"),
+          Text("row", "#47b123"),
+          Text("row", "#47b123"),
+    ])
   ]),
   {
     backgroundColor: "#ffffff",

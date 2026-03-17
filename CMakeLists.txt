@@ -26,6 +26,8 @@ target_compile_definitions(quickjs PRIVATE
 # -------- Engine --------
 add_executable(engine
     engine/main.cpp
+    engine/app.cpp
+    engine/hot_reload.cpp
     engine/runtime.cpp
     engine/bindings.cpp
     engine/renderer.cpp
