@@ -1,6 +1,11 @@
 #pragma once
+#include <cstdint>
 #include <string>
 
-void addDrawRect(int x, int y, int w, int h);
-void addDrawText(const std::string& text, int x, int y);
+void initSkia(int width, int height);
+void addDrawRect(float x, float y, float w, float h, uint32_t color);
+void addDrawText(const std::string& text, float x, float y, uint32_t color);
+void setBackgroundColor(uint32_t color);
+void setTextColor(uint32_t color);
 void flushCommands();
+void cleanupSkia();

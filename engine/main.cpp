@@ -1,3 +1,5 @@
+#include "../quickjs/quickjs.h"
+#include "renderer.h"
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include <string>
@@ -8,16 +10,19 @@ void shutdownJS();
 void runScript(const std::string &path);
 
 // Bindings
-#include "quickjs/quickjs.h" // Needed for JSContext in registerBindings
-#include "renderer.h"
 void registerBindings(JSContext *ctx);
 extern JSContext *ctx;
 
 int main() {
   if (!glfwInit()) {
-    std::cout << "GLFW init failed\n";
+    std::cerr << "GLFW init failed\n";
     return -1;
   }
+
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+  glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
   GLFWwindow *window = glfwCreateWindow(800, 600, "TS Skia Engine", NULL, NULL);
 
@@ -28,8 +33,11 @@ int main() {
 
   glfwMakeContextCurrent(window);
 
-  // Set clear color (light gray)
-  glClearColor(0.9f, 0.9f, 0.9f, 1.0f);
+  int width, height;
+  glfwGetFramebufferSize(window, &width, &height);
+
+  // Initialize Skia
+  initSkia(width, height);
 
   // Initialize JS
   initJS();
@@ -41,8 +49,6 @@ int main() {
   std::cout << "Script loaded." << std::endl;
 
   while (!glfwWindowShouldClose(window)) {
-    glClear(GL_COLOR_BUFFER_BIT);
-
     // Render frame
     flushCommands();
 
@@ -51,5 +57,7 @@ int main() {
   }
 
   shutdownJS();
+  cleanupSkia();
   glfwTerminate();
+  return 0;
 }

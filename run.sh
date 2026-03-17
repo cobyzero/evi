@@ -25,7 +25,7 @@ if ! cmake ..; then
     exit 1
 fi
 
-if ! make -j$(sysctl -n hw.ncpu 2>/dev/null || echo 4); then
+if ! cmake --build . -j$(sysctl -n hw.ncpu 2>/dev/null || echo 4); then
     echo -e "${RED}❌ Error compilando el Engine nativo${NC}"
     exit 1
 fi
