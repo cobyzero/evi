@@ -1,4 +1,4 @@
-# EVI (Evolution Engine)
+# EVI
 
 ![EVI Logo](/Users/mac/.gemini/antigravity/brain/4bb173a1-fba8-4d6b-897f-e42cf03dd029/evi_engine_logo_1773856314160.png)
 
