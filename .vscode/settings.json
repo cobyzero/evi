@@ -1,0 +1,9 @@
+{
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "muhammad-sammy.csharp",
+    "csharp.format.enable": false,
+    "csharpier.csharpierPath": "/opt/homebrew/bin/csharpier",
+    "editor.codeActionsOnSave": {
+        "source.organizeImports.csharp": "explicit",
+    }
+}

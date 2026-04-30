@@ -1,10 +1,35 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net10.0</TargetFramework>
+    <TargetFrameworks>net9.0</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <RootNamespace>Evi</RootNamespace>
+    <!-- iOS specific -->
+    <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">15.0</SupportedOSPlatformVersion>
+    <MtouchSkipXcodeVersionCheck Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">true</MtouchSkipXcodeVersionCheck>
+    <_MtouchSkipXcodeVersionCheck Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">true</_MtouchSkipXcodeVersionCheck>
+    <_MicrosoftiOSSdkSkipXcodeVersionCheck Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">true</_MicrosoftiOSSdkSkipXcodeVersionCheck>
+    <XcodeVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">26.0</XcodeVersion>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="SkiaSharp" Version="3.119.2" />
+    <PackageReference Include="Silk.NET.Windowing" Version="2.20.0" Condition="'$(TargetPlatformIdentifier)' != 'ios'" />
+    <PackageReference Include="Silk.NET.Input" Version="2.20.0" Condition="'$(TargetPlatformIdentifier)' != 'ios'" />
+    <PackageReference Include="Silk.NET.OpenGL" Version="2.20.0" Condition="'$(TargetPlatformIdentifier)' != 'ios'" />
+    <PackageReference Include="Spectre.Console" Version="0.49.1" />
+  </ItemGroup>
+
+  <ItemGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">
+    <PackageReference Include="SkiaSharp.Views" Version="3.119.2" />
+  </ItemGroup>
+
+  <!-- Excluir Test y Apps del build -->
+  <ItemGroup>
+    <Compile Remove="Test/**" />
+    <Compile Remove="testapp/**" />
+  </ItemGroup>
 
 </Project>

@@ -2,3 +2,6 @@
 /build
 /dist
 /obj
+/.idea
+/bin
+/testapp
