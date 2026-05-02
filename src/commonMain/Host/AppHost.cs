@@ -1,10 +1,11 @@
-
+using System;
 
 namespace Evi
 {
     public abstract class AppHost(Component root)
     {
         protected Component Root { get; set; } = root;
+        private ComponentElement? _rootElement;
 
         public abstract void Run();
         public virtual void RequestRedraw() { }
@@ -15,17 +16,38 @@ namespace Evi
         public virtual void HotReload(Component newRoot)
         {
             Root = newRoot;
+            _rootElement = null; // Forzar reconstrucción completa
             RequestRedraw();
         }
 
         /// <summary>
-        /// Renderiza el frame actual usando el árbol de componentes.
+        /// Obtiene o reconstruye el árbol de renderizado actual reconciliado.
         /// </summary>
-        internal void RenderFrame(IRenderer renderer, float viewportWidth, float viewportHeight)
+        internal RenderNode GetCurrentRenderTree(float viewportWidth, float viewportHeight)
         {
-            RenderNode renderTree = Root.Build();
+            if (_rootElement == null)
+            {
+                _rootElement = new ComponentElement(Root);
+                _rootElement.Mount();
+            }
+            else
+            {
+                _rootElement.Update(Root);
+            }
+
+            RenderNode renderTree = _rootElement.RenderNode!;
             renderTree.Layout(viewportWidth, viewportHeight);
+            return renderTree;
+        }
+
+        /// <summary>
+        /// Renderiza el frame actual usando el árbol de componentes persistente.
+        /// </summary>
+        internal RenderNode RenderFrame(IRenderer renderer, float viewportWidth, float viewportHeight)
+        {
+            RenderNode renderTree = GetCurrentRenderTree(viewportWidth, viewportHeight);
             renderTree.Render(renderer);
+            return renderTree;
         }
     }
 

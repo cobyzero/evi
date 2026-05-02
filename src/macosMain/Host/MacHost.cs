@@ -3,6 +3,7 @@ using Silk.NET.Windowing;
 using Silk.NET.Input;
 using Silk.NET.OpenGL;
 using SkiaSharp;
+using System;
 
 namespace Evi
 {
@@ -13,6 +14,7 @@ namespace Evi
         private GRContext? _grContext;
         private SKSurface? _surface;
         private GRBackendRenderTarget? _renderTarget;
+        private IInputContext? _input;
 
         // Hot Reload: flag para reconstruir la UI en el próximo frame del loop de Silk.NET
         private volatile bool _pendingHotReload = false;
@@ -44,12 +46,23 @@ namespace Evi
             GRGlInterface interface_ = GRGlInterface.Create();
             _grContext = GRContext.CreateGl(interface_);
 
-            IInputContext input = _window!.CreateInput();
-            foreach (IMouse mouse in input.Mice)
+            _input = _window!.CreateInput();
+            foreach (IMouse mouse in _input.Mice)
             {
                 mouse.MouseDown += (m, b) => DispatchPointerEvent(m.Position.X, m.Position.Y, PointerEventType.Pressed);
                 mouse.MouseUp += (m, b) => DispatchPointerEvent(m.Position.X, m.Position.Y, PointerEventType.Released);
                 mouse.MouseMove += (m, pos) => DispatchPointerEvent(pos.X, pos.Y, PointerEventType.Moved);
+            }
+
+            foreach (IKeyboard keyboard in _input.Keyboards)
+            {
+                keyboard.KeyChar += (k, c) => DispatchKeyEvent(c.ToString(), KeyEventType.Character);
+                keyboard.KeyDown += (k, key, i) =>
+                {
+                    if (key == Key.Backspace) DispatchKeyEvent("Backspace", KeyEventType.Pressed);
+                    if (key == Key.Enter) DispatchKeyEvent("Enter", KeyEventType.Pressed);
+                    if (key == Key.Delete) DispatchKeyEvent("Delete", KeyEventType.Pressed);
+                };
             }
 
             CreateSurface();
@@ -57,9 +70,29 @@ namespace Evi
 
         private void DispatchPointerEvent(float x, float y, PointerEventType type)
         {
-            RenderNode renderTree = Root.Build();
-            renderTree.Layout(_window!.Size.X, _window.Size.Y);
+            if (type == PointerEventType.Pressed)
+            {
+                TextFieldRenderNode.ClearFocus();
+            }
+
+            if (type == PointerEventType.Released)
+            {
+                PointerManager.PressedIdentity = null;
+            }
+
+            if (type == PointerEventType.Moved)
+            {
+                HoverManager.HoveredIdentity = null;
+            }
+            
+            RenderNode renderTree = GetCurrentRenderTree(_window!.Size.X, _window.Size.Y);
             renderTree.HandlePointerEvent(new PointerEvent(x, y, type));
+        }
+
+        private void DispatchKeyEvent(string key, KeyEventType type)
+        {
+            RenderNode renderTree = GetCurrentRenderTree(_window!.Size.X, _window.Size.Y);
+            renderTree.HandleKeyEvent(new KeyEvent(key, type));
         }
 
         private void OnResize(Silk.NET.Maths.Vector2D<int> size)
@@ -83,7 +116,6 @@ namespace Evi
             if (_surface == null || _window == null)
                 return;
 
-            // Aplicar Hot Reload si hay un root pendiente (thread-safe)
             if (_pendingHotReload)
             {
                 lock (_hotReloadLock)
@@ -111,10 +143,6 @@ namespace Evi
             Dispose();
         }
 
-        /// <summary>
-        /// Hot Reload: encola el nuevo root para ser aplicado de forma segura
-        /// en el hilo del render loop de Silk.NET en el próximo frame.
-        /// </summary>
         public override void HotReload(Component newRoot)
         {
             lock (_hotReloadLock)
@@ -124,13 +152,11 @@ namespace Evi
             }
         }
 
-        public override void RequestRedraw()
-        {
-            // El render loop de Silk.NET ya redibuja continuamente; no hace falta nada extra.
-        }
+        public override void RequestRedraw() { }
 
         public void Dispose()
         {
+            _input?.Dispose();
             _surface?.Dispose();
             _renderTarget?.Dispose();
             _grContext?.Dispose();
@@ -138,5 +164,4 @@ namespace Evi
         }
     }
 }
-
 #endif

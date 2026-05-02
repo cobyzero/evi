@@ -32,6 +32,7 @@ namespace Evi.iOS.Host
             if (IosBridge.Root != null)
             {
                 var host = new IosHost(IosBridge.Root);
+                App.CurrentHost = host;
                 Window.RootViewController = host.CreateViewController();
             }
 

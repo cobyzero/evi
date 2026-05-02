@@ -1,6 +1,8 @@
 
 
 
+using System.Collections.Generic;
+
 namespace Evi
 {
     public abstract class RenderNode
@@ -10,6 +12,7 @@ namespace Evi
         public float Width { get; set; }
         public float Height { get; set; }
         public int Flex { get; set; } = 0;
+        public Component? Creator { get; set; }
 
         public List<RenderNode> Children { get; } = [];
 
@@ -18,9 +21,27 @@ namespace Evi
             Children.Add(child);
         }
 
+        public void RemoveChild(RenderNode child)
+        {
+            Children.Remove(child);
+        }
+
+        public virtual void CopyPropertiesFrom(RenderNode other)
+        {
+            // Propiedades base ya se copian en el reconciliador
+        }
+
         public abstract void Render(IRenderer renderer);
 
         public abstract void Layout(float maxWidth, float maxHeight);
+
+        public virtual void HandleKeyEvent(KeyEvent e)
+        {
+            foreach (RenderNode child in Children)
+            {
+                child.HandleKeyEvent(e);
+            }
+        }
 
         public virtual void HandlePointerEvent(PointerEvent e)
         {
@@ -28,9 +49,12 @@ namespace Evi
             for (int i = Children.Count - 1; i >= 0; i--)
             {
                 RenderNode child = Children[i];
-                if (child.HitTest(e.X - X, e.Y - Y))
+                float childLocalX = e.X - child.X;
+                float childLocalY = e.Y - child.Y;
+
+                if (child.HitTest(childLocalX, childLocalY))
                 {
-                    child.HandlePointerEvent(e with { X = e.X - X, Y = e.Y - Y });
+                    child.HandlePointerEvent(e with { X = childLocalX, Y = childLocalY });
                     return;
                 }
             }

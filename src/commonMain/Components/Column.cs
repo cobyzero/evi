@@ -28,6 +28,15 @@ namespace Evi
         public MainAxisAlignment MainAxisAlignment { get; set; }
         public CrossAxisAlignment CrossAxisAlignment { get; set; }
 
+        public override void CopyPropertiesFrom(RenderNode other)
+        {
+            if (other is ColumnRenderNode otherColumn)
+            {
+                MainAxisAlignment = otherColumn.MainAxisAlignment;
+                CrossAxisAlignment = otherColumn.CrossAxisAlignment;
+            }
+        }
+
         public override void Render(IRenderer renderer)
         {
             renderer.Save();

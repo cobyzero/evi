@@ -25,6 +25,16 @@ namespace Evi
         public Color TextColor { get; set; } = Color.Black;
         public float FontSize { get; set; } = 16;
 
+        public override void CopyPropertiesFrom(RenderNode other)
+        {
+            if (other is TextRenderNode otherText)
+            {
+                Text = otherText.Text;
+                TextColor = otherText.TextColor;
+                FontSize = otherText.FontSize;
+            }
+        }
+
         public override void Render(IRenderer renderer)
         {
             renderer.Save();

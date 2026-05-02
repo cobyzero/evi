@@ -10,7 +10,7 @@ namespace Evi
     /// </summary>
     public static class App
     {
-        internal static AppHost? CurrentHost { get; private set; }
+        internal static AppHost? CurrentHost { get; set; }
         internal static Func<Component>? RootFactory { get; private set; }
 
         /// <summary>
@@ -26,6 +26,13 @@ namespace Evi
 #if IOS
             IosBridge.SetRoot(root);
             UIKit.UIApplication.Main([], null, typeof(EviAppDelegate).FullName);
+#elif ANDROID
+            Evi.Android.Host.AndroidBridge.SetRoot(root);
+#elif WEB
+            using WebHost host = new(root);
+            CurrentHost = host;
+            host.Run();
+            CurrentHost = null;
 #else
             using MacHost host = new(root);
             CurrentHost = host;
