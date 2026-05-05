@@ -1,12 +1,10 @@
 #if IOS
 using UIKit;
+using Foundation;
+using CoreAnimation;
 using SkiaSharp;
 using SkiaSharp.Views.iOS;
-using Evi.Core;
-using Evi.Rendering;
-using Evi.Host;
-using Evi.Components;
-using Evi.Core.Events;
+using Evi;
 
 namespace Evi.iOS.Host
 {
@@ -43,6 +41,9 @@ namespace Evi.iOS.Host
         {
             private readonly IosHost _host;
             private EviCanvasView? _canvasView;
+#if DEBUG
+            private CADisplayLink? _displayLink;
+#endif
 
             public EviViewController(IosHost host)
             {
@@ -52,13 +53,44 @@ namespace Evi.iOS.Host
             public override void LoadView()
             {
                 _canvasView = new EviCanvasView(_host);
+                _canvasView.AutoresizingMask = UIViewAutoresizing.FlexibleWidth | UIViewAutoresizing.FlexibleHeight;
                 View = _canvasView;
+            }
+
+            public override void ViewDidLayoutSubviews()
+            {
+                base.ViewDidLayoutSubviews();
+                _canvasView?.SetNeedsDisplay();
             }
 
             public void RequestRedraw()
             {
                 _canvasView?.SetNeedsDisplay();
             }
+
+#if DEBUG
+            public override void ViewDidAppear(bool animated)
+            {
+                base.ViewDidAppear(animated);
+
+                if (_displayLink == null)
+                {
+                    _displayLink = CADisplayLink.Create(() =>
+                    {
+                        _canvasView?.SetNeedsDisplay();
+                    });
+                    _displayLink.PreferredFramesPerSecond = 4;
+                    _displayLink.AddToRunLoop(NSRunLoop.Main, NSRunLoopMode.Common);
+                }
+            }
+
+            public override void ViewWillDisappear(bool animated)
+            {
+                base.ViewWillDisappear(animated);
+                _displayLink?.Invalidate();
+                _displayLink = null;
+            }
+#endif
         }
 
         private class EviCanvasView : SKCanvasView
@@ -69,6 +101,7 @@ namespace Evi.iOS.Host
             {
                 _host = host;
                 UserInteractionEnabled = true;
+                IgnorePixelScaling = true;
             }
 
             public override void TouchesBegan(Foundation.NSSet touches, UIEvent? evt)
@@ -109,8 +142,12 @@ namespace Evi.iOS.Host
                 var canvas = e.Surface.Canvas;
                 canvas.Clear(SKColors.White);
 
+                // Con IgnorePixelScaling=true trabajamos en coordenadas lógicas (puntos UIKit).
+                var viewportWidth = (float)Bounds.Width;
+                var viewportHeight = (float)Bounds.Height;
+
                 var renderer = new SkiaRenderer(canvas);
-                _host.RenderFrame(renderer, (float)Bounds.Width, (float)Bounds.Height);
+                _host.RenderFrame(renderer, viewportWidth, viewportHeight);
             }
         }
     }

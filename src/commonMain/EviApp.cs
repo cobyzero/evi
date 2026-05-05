@@ -1,4 +1,7 @@
 using System.Reflection.Metadata;
+#if IOS
+using Evi.iOS.Host;
+#endif
 
 [assembly: MetadataUpdateHandler(typeof(Evi.HotReloadManager))]
 
@@ -10,7 +13,7 @@ namespace Evi
     /// </summary>
     public static class App
     {
-        internal static AppHost? CurrentHost { get; set; }
+        public static AppHost? CurrentHost { get; set; }
         internal static Func<Component>? RootFactory { get; private set; }
 
         /// <summary>
@@ -25,7 +28,7 @@ namespace Evi
 
 #if IOS
             IosBridge.SetRoot(root);
-            UIKit.UIApplication.Main([], null, typeof(EviAppDelegate).FullName);
+            UIKit.UIApplication.Main([], null, typeof(EviAppDelegate));
 #elif ANDROID
             Evi.Android.Host.AndroidBridge.SetRoot(root);
 #elif WEB
@@ -59,12 +62,17 @@ namespace Evi
         public static void UpdateApplication(Type[]? types)
         {
             if (App.CurrentHost == null || App.RootFactory == null)
+            {
+                Console.WriteLine($"[Evi Hot Reload] Skipped. Host null: {App.CurrentHost == null}, RootFactory null: {App.RootFactory == null}");
                 return;
+            }
 
             try
             {
+                Console.WriteLine($"[Evi Hot Reload] Applying update. Types: {types?.Length ?? 0}");
                 Component newRoot = App.RootFactory();
                 App.CurrentHost.HotReload(newRoot);
+                Console.WriteLine("[Evi Hot Reload] UI redraw requested.");
             }
             catch (Exception ex)
             {

@@ -2,7 +2,7 @@
 using Android.App;
 using Android.OS;
 using Android.Content.PM;
-using Evi.Core;
+using Evi;
 
 namespace Evi.Android.Host;
 
@@ -19,9 +19,7 @@ internal static class AndroidBridge
     }
 }
 
-[Activity(Label = "Evi App", 
-          MainLauncher = true, 
-          ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation | ConfigChanges.UiMode | ConfigChanges.ScreenLayout | ConfigChanges.SmallestScreenSize)]
+[Android.Runtime.Register("evi/android/host/EviActivity")]
 public class EviActivity : Activity
 {
     protected override void OnCreate(Bundle? savedInstanceState)

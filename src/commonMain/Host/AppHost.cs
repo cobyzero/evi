@@ -23,7 +23,7 @@ namespace Evi
         /// <summary>
         /// Obtiene o reconstruye el árbol de renderizado actual reconciliado.
         /// </summary>
-        internal RenderNode GetCurrentRenderTree(float viewportWidth, float viewportHeight)
+        public RenderNode GetCurrentRenderTree(float viewportWidth, float viewportHeight)
         {
             if (_rootElement == null)
             {
@@ -43,7 +43,7 @@ namespace Evi
         /// <summary>
         /// Renderiza el frame actual usando el árbol de componentes persistente.
         /// </summary>
-        internal RenderNode RenderFrame(IRenderer renderer, float viewportWidth, float viewportHeight)
+        public RenderNode RenderFrame(IRenderer renderer, float viewportWidth, float viewportHeight)
         {
             RenderNode renderTree = GetCurrentRenderTree(viewportWidth, viewportHeight);
             renderTree.Render(renderer);

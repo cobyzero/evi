@@ -39,7 +39,7 @@ namespace Evi
         }
     }
 
-    internal class TextFieldRenderNode : RenderNode
+    public class TextFieldRenderNode : RenderNode
     {
         public string Placeholder { get; set; } = string.Empty;
         public TextEditingController? Controller { get; set; }

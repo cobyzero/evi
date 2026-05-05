@@ -1,8 +1,6 @@
 #if IOS
 using UIKit;
-using Evi.Core;
-using Evi.Host;
-using Evi.Components;
+using Evi;
 
 namespace Evi.iOS.Host
 {

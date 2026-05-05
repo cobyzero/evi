@@ -2,8 +2,7 @@
 using Android.Content;
 using Android.Views;
 using SkiaSharp.Views.Android;
-using Evi.Core;
-using Evi.Rendering;
+using Evi;
 
 namespace Evi.Android.Host;
 

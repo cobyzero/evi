@@ -1,4 +1,4 @@
-#if !IOS
+#if WEB
 using System.Net;
 using System.Net.WebSockets;
 using System.Text;
@@ -227,7 +227,7 @@ public class WebHost(Component root) : AppHost(root), IDisposable
               cursor: default;
               image-rendering: pixelated;
             }
-            #status {
+            .status {
               position: fixed;
               bottom: 10px;
               right: 10px;
@@ -240,11 +240,11 @@ public class WebHost(Component root) : AppHost(root), IDisposable
         </head>
         <body>
           <canvas id="c"></canvas>
-          <div id="status">CONECTANDO...</div>
+          <div class="status">CONECTANDO...</div>
           <script>
             const canvas = document.getElementById('c');
             const ctx = canvas.getContext('2d', { alpha: false });
-            const status = document.getElementById('status');
+            const status = document.querySelector('.status');
             const ws = new WebSocket(`ws://${location.host}/`);
             ws.binaryType = 'blob';
 
